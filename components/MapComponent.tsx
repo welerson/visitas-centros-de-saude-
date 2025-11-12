@@ -7,7 +7,8 @@ import { PinIcon, PoliceCarIcon } from './Icons';
 
 interface MapComponentProps {
   healthCenters: HealthCenter[];
-  currentLocation: Coordinates | null;
+  vehicleLocations: { [key in VTR]?: Coordinates };
+  controlledVehicleLocation: Coordinates | null;
   selectedVTR: VTR;
 }
 
@@ -29,16 +30,17 @@ const createDivIcon = (iconComponent: React.ReactElement, size: [number, number]
   });
 };
 
-const MapComponent: React.FC<MapComponentProps> = ({ healthCenters, currentLocation, selectedVTR }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ healthCenters, vehicleLocations, controlledVehicleLocation, selectedVTR }) => {
   
   const icons = useMemo(() => ({
     unvisited: createDivIcon(<PinIcon color="#4f46e5" />, [32, 32]), // Indigo 600
     visited: createDivIcon(<PinIcon color="#16a34a" />, [32, 32]), // Green 600
-    current: createDivIcon(<PoliceCarIcon color={selectedVTR === VTR.Alfa ? '#facc15' : '#38bdf8'} />, [40, 40]), // Yellow-400 or Sky-400
-  }), [selectedVTR]);
+    [VTR.Alfa]: createDivIcon(<PoliceCarIcon color={'#facc15'} />, [40, 40]), // Yellow-400
+    [VTR.Bravo]: createDivIcon(<PoliceCarIcon color={'#38bdf8'} />, [40, 40]), // Sky-400
+  }), []);
 
   return (
-    <MapContainer center={[currentLocation?.lat ?? -19.811, currentLocation?.lng ?? -43.979]} zoom={14} scrollWheelZoom={true} className="z-0">
+    <MapContainer center={[controlledVehicleLocation?.lat ?? -19.811, controlledVehicleLocation?.lng ?? -43.979]} zoom={14} scrollWheelZoom={true} className="z-0">
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -60,17 +62,23 @@ const MapComponent: React.FC<MapComponentProps> = ({ healthCenters, currentLocat
         </Marker>
       ))}
 
-      {currentLocation && (
-        <Marker 
-            position={[currentLocation.lat, currentLocation.lng]} 
-            icon={icons.current}
-            zIndexOffset={1000}
-        >
-            <Popup>{selectedVTR}</Popup>
-        </Marker>
-      )}
+      {/* FIX: Explicitly type the arguments of the map function to fix type inference issue where `location` was inferred as `unknown`. */}
+      {Object.entries(vehicleLocations).map(([vtr, location]: [string, Coordinates | undefined]) => {
+        if (!location) return null;
+        const vtrKey = vtr as VTR;
+        return (
+          <Marker 
+            key={vtrKey}
+            position={[location.lat, location.lng]} 
+            icon={icons[vtrKey]}
+            zIndexOffset={vtrKey === selectedVTR ? 1000 : 900} // Bring controlled VTR to the front
+          >
+              <Popup>{vtrKey}</Popup>
+          </Marker>
+        );
+      })}
 
-      {currentLocation && <RecenterAutomatically lat={currentLocation.lat} lng={currentLocation.lng} />}
+      {controlledVehicleLocation && <RecenterAutomatically lat={controlledVehicleLocation.lat} lng={controlledVehicleLocation.lng} />}
     </MapContainer>
   );
 };

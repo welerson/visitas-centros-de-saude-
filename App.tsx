@@ -16,11 +16,16 @@ const getInitialHealthCenters = (): HealthCenter[] =>
 function App() {
   const [healthCenters, setHealthCenters] = useState<HealthCenter[]>(getInitialHealthCenters());
   const [visits, setVisits] = useState<Visit[]>([]);
-  const [currentLocation, setCurrentLocation] = useState<Coordinates | null>(null);
+  const [vehicleLocations, setVehicleLocations] = useState<{ [key in VTR]?: Coordinates }>({
+    [VTR.Alfa]: INITIAL_CENTER,
+    [VTR.Bravo]: { lat: INITIAL_CENTER.lat + 0.005, lng: INITIAL_CENTER.lng + 0.005 }, // Start slightly offset
+  });
   const [selectedVTR, setSelectedVTR] = useState<VTR>(VTR.Alfa);
   const [nearbyCenter, setNearbyCenter] = useState<HealthCenter | null>(null);
   const [nextRecommendedCenter, setNextRecommendedCenter] = useState<HealthCenter | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
+
+  const currentLocation = vehicleLocations[selectedVTR] ?? null;
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -30,10 +35,13 @@ function App() {
 
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
-        setCurrentLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
+        setVehicleLocations(prev => ({
+          ...prev,
+          [selectedVTR]: {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          }
+        }));
         setLocationError(null);
       },
       (error) => {
@@ -44,7 +52,7 @@ function App() {
     );
 
     return () => navigator.geolocation.clearWatch(watchId);
-  }, []);
+  }, [selectedVTR]); // Rerun when the controlled VTR changes
 
   useEffect(() => {
     if (!currentLocation) return;
@@ -53,11 +61,10 @@ function App() {
     let minDistanceToUnvisited = Infinity;
     let foundNearbyCenter: HealthCenter | null = null;
     
-    // Proximity check for ANY center
+    // Proximity check for ANY center based on the controlled vehicle
     for (const center of healthCenters) {
         const distance = calculateDistance(currentLocation, center);
         if (distance <= PROXIMITY_THRESHOLD_METERS) {
-            // If multiple are nearby, pick the closest
             if (!foundNearbyCenter || distance < calculateDistance(currentLocation, foundNearbyCenter)) {
                 foundNearbyCenter = center;
             }
@@ -122,18 +129,22 @@ function App() {
       <header className="bg-slate-900 shadow-lg p-3 flex flex-col sm:flex-row justify-between items-center z-20 text-white gap-3">
         <h1 className="text-xl font-bold text-yellow-400">GCMBH - Monitoramento Venda Nova</h1>
         <div className="flex items-center gap-4">
-          <select 
-            value={selectedVTR} 
-            onChange={e => setSelectedVTR(e.target.value as VTR)}
-            className="bg-slate-700 border border-slate-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
-          >
-            <option value={VTR.Alfa}>VTR Alfa</option>
-            <option value={VTR.Bravo}>VTR Bravo</option>
-          </select>
+          <div className="flex flex-col items-start">
+            <label htmlFor="vtr-select" className="text-xs text-slate-400 mb-1">Controlando:</label>
+            <select
+              id="vtr-select"
+              value={selectedVTR} 
+              onChange={e => setSelectedVTR(e.target.value as VTR)}
+              className="bg-slate-700 border border-slate-600 rounded-md px-3 py-1 text-white focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            >
+              <option value={VTR.Alfa}>VTR Alfa</option>
+              <option value={VTR.Bravo}>VTR Bravo</option>
+            </select>
+          </div>
           <button
             onClick={() => generateVisitReport(visits)}
             disabled={visits.length === 0}
-            className="flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-500 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
+            className="self-end flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-500 text-white font-bold py-2 px-4 rounded-md transition-colors duration-200"
           >
             <PdfIcon />
             Baixar PDF
@@ -150,7 +161,8 @@ function App() {
           )}
           <MapComponent 
             healthCenters={healthCenters} 
-            currentLocation={currentLocation ?? INITIAL_CENTER} 
+            vehicleLocations={vehicleLocations}
+            controlledVehicleLocation={currentLocation} 
             selectedVTR={selectedVTR} 
           />
         </div>
@@ -164,7 +176,7 @@ function App() {
                 onClick={handleMarkAsVisited}
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition-colors"
               >
-                Marcar como Visitado
+                Marcar como Visitado ({selectedVTR})
               </button>
             </div>
           )}
