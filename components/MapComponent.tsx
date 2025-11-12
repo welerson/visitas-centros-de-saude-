@@ -1,11 +1,13 @@
-// FIX: Add missing imports for React, react-leaflet, react-dom/server, and leaflet.
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import { renderToStaticMarkup } from 'react-dom/server';
-import L from 'leaflet';
-
 import { HealthCenter, Coordinates, VTR } from '../types.ts';
 import { PinIcon, PoliceCarIcon } from './Icons.tsx';
+// FIX: Cannot find name 'React'. Import React and necessary hooks.
+import React, { useEffect, useMemo } from 'react';
+// FIX: Cannot find name 'ReactLeaflet'. Import components from 'react-leaflet'.
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+// FIX: Cannot find name 'ReactDOMServer'. Import from 'react-dom/server'.
+import { renderToStaticMarkup } from 'react-dom/server';
+// FIX: Cannot find name 'L'. Import from 'leaflet'.
+import L from 'leaflet';
 
 interface MapComponentProps {
   healthCenters: HealthCenter[];
@@ -16,7 +18,7 @@ interface MapComponentProps {
 
 const RecenterAutomatically = ({ lat, lng }: { lat: number; lng: number }) => {
   const map = useMap();
-  React.useEffect(() => {
+  useEffect(() => {
     map.setView([lat, lng], map.getZoom());
   }, [lat, lng, map]);
   return null;
@@ -34,8 +36,7 @@ const createDivIcon = (iconComponent: React.ReactElement, size: [number, number]
 
 const MapComponent: React.FC<MapComponentProps> = ({ healthCenters, vehicleLocations, controlledVehicleLocation, selectedVTR }) => {
   
-  // FIX: Qualify `useMemo` with `React` since it is no longer destructured at the top of the file.
-  const icons = React.useMemo(() => ({
+  const icons = useMemo(() => ({
     unvisited: createDivIcon(<PinIcon color="#4f46e5" />, [32, 32]), // Indigo 600
     visited: createDivIcon(<PinIcon color="#16a34a" />, [32, 32]), // Green 600
     [VTR.Alfa]: createDivIcon(<PoliceCarIcon color={'#facc15'} />, [40, 40]), // Yellow-400
@@ -65,7 +66,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ healthCenters, vehicleLocat
         </Marker>
       ))}
 
-      {/* FIX: Explicitly type the arguments of the map function to fix type inference issue where `location` was inferred as `unknown`. */}
       {Object.entries(vehicleLocations).map(([vtr, location]: [string, Coordinates | undefined]) => {
         if (!location) return null;
         const vtrKey = vtr as VTR;
