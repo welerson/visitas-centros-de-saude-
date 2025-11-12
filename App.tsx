@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { HealthCenter, Coordinates, VTR, Visit } from './types';
-import { HEALTH_CENTERS_DATA, PROXIMITY_THRESHOLD_METERS, INITIAL_CENTER } from './constants';
-import { calculateDistance } from './services/locationService';
-import { generateVisitReport } from './services/pdfService';
-import MapComponent from './components/MapComponent';
-import { PdfIcon, CheckCircleIcon, AlertTriangleIcon, TargetIcon } from './components/Icons';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { HealthCenter, Coordinates, VTR, Visit } from './types.ts';
+import { HEALTH_CENTERS_DATA, PROXIMITY_THRESHOLD_METERS, INITIAL_CENTER } from './constants.ts';
+import { calculateDistance } from './services/locationService.ts';
+import { generateVisitReport } from './services/pdfService.ts';
+import MapComponent from './components/MapComponent.tsx';
+import { PdfIcon, CheckCircleIcon, AlertTriangleIcon, TargetIcon } from './components/Icons.tsx';
 
 const getInitialHealthCenters = (): HealthCenter[] =>
   HEALTH_CENTERS_DATA.map((center, index) => ({

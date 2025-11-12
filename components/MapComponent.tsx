@@ -1,9 +1,11 @@
-import React, { useMemo } from 'react';
+// FIX: Add missing imports for React, react-leaflet, react-dom/server, and leaflet.
+import React from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { HealthCenter, Coordinates, VTR } from '../types';
-import { PinIcon, PoliceCarIcon } from './Icons';
+import L from 'leaflet';
+
+import { HealthCenter, Coordinates, VTR } from '../types.ts';
+import { PinIcon, PoliceCarIcon } from './Icons.tsx';
 
 interface MapComponentProps {
   healthCenters: HealthCenter[];
@@ -32,7 +34,8 @@ const createDivIcon = (iconComponent: React.ReactElement, size: [number, number]
 
 const MapComponent: React.FC<MapComponentProps> = ({ healthCenters, vehicleLocations, controlledVehicleLocation, selectedVTR }) => {
   
-  const icons = useMemo(() => ({
+  // FIX: Qualify `useMemo` with `React` since it is no longer destructured at the top of the file.
+  const icons = React.useMemo(() => ({
     unvisited: createDivIcon(<PinIcon color="#4f46e5" />, [32, 32]), // Indigo 600
     visited: createDivIcon(<PinIcon color="#16a34a" />, [32, 32]), // Green 600
     [VTR.Alfa]: createDivIcon(<PoliceCarIcon color={'#facc15'} />, [40, 40]), // Yellow-400
