@@ -1,4 +1,4 @@
-// FIX: Import React and hooks to resolve 'Cannot find name' error.
+// FIX: Import React and hooks directly instead of destructuring from a UMD global in a module.
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { HealthCenter, Coordinates, VTR, Visit } from './types.ts';

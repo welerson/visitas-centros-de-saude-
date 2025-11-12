@@ -1,6 +1,6 @@
-// FIX: Import React, StrictMode and createRoot to resolve 'Cannot find name' errors.
-import React, { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+// FIX: Import React and ReactDOM to resolve UMD global errors.
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 
 import App from './App.tsx';
 
@@ -9,9 +9,9 @@ if (!rootElement) {
   throw new Error("Could not find root element to mount to");
 }
 
-const root = createRoot(rootElement);
+const root = ReactDOM.createRoot(rootElement);
 root.render(
-  <StrictMode>
+  <React.StrictMode>
     <App />
-  </StrictMode>
+  </React.StrictMode>
 );

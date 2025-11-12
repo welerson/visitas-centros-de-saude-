@@ -1,8 +1,7 @@
-// FIX: Import React, ReactLeaflet, and ReactDOMServer to resolve 'Cannot find name' errors.
+// FIX: Import dependencies from their packages instead of using UMD globals in a module.
 import React, { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { renderToStaticMarkup } from 'react-dom/server';
-
 
 // L is loaded globally by the Leaflet script
 declare const L: any;
