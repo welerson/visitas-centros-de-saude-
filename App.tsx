@@ -1,11 +1,12 @@
+// FIX: Import React and hooks to resolve 'Cannot find name' error.
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+
 import { HealthCenter, Coordinates, VTR, Visit } from './types.ts';
 import { HEALTH_CENTERS_DATA, PROXIMITY_THRESHOLD_METERS, INITIAL_CENTER } from './constants.ts';
 import { calculateDistance } from './services/locationService.ts';
 import { generateVisitReport } from './services/pdfService.ts';
 import MapComponent from './components/MapComponent.tsx';
 import { PdfIcon, CheckCircleIcon, AlertTriangleIcon, TargetIcon } from './components/Icons.tsx';
-// FIX: Import React and hooks to resolve 'Cannot find name' error.
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
 
 const getInitialHealthCenters = (): HealthCenter[] =>
   HEALTH_CENTERS_DATA.map((center, index) => ({

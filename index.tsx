@@ -1,12 +1,8 @@
-import App from './App.tsx';
-// FIX: Import React to resolve 'Cannot find name' error.
-import React from 'react';
-// FIX: Import ReactDOM to resolve 'Cannot find name' error.
-import ReactDOM from 'react-dom/client';
+// FIX: Import React, StrictMode and createRoot to resolve 'Cannot find name' errors.
+import React, { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 
-// React and ReactDOM are now global variables from the scripts in index.html
-const { StrictMode } = React;
-const { createRoot } = ReactDOM;
+import App from './App.tsx';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
