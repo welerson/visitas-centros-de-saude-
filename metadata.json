@@ -1,0 +1,7 @@
+{
+  "name": "GCMBH Venda Nova - Monitoramento de Visitas",
+  "description": "Um sistema web para monitoramento em tempo real de visitas a Centros de Saúde na Regional Venda Nova, Belo Horizonte, por viaturas da Guarda Civil Municipal.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
